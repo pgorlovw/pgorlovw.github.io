@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пушечное ядро</title>
+</head>
+<body>
+    <canvas id="myCanvas" style="border: 2px solid;"></canvas>
+
+    <script>
+
+    // Учимся рисовать пушечное ядро!
+    // https://www.youtube.com/watch?v=oPuSvdBGrpE
+    // настройки холста
+
+    var canvas = document.getElementById("myCanvas")
+    var c = canvas.getContext('2d')
+
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 100;
+
+    var simMinWidth = 20.0;
+    var cScale = Math.min(canvas.width, canvas.height) / simMinWidth;
+    var simWidth = canvas.width / cScale;
+    var simHeight = canvas.height / cScale;
+
+    function cX(pos) {
+        return pos.x * cScale;
+    }
+
+    function cY(pos) {
+        return canvas.height - pos.y * cScale;
+    }
+
+    // сцена
+
+    var gravity = { x: 0, y: -10.0 }
+    var timeStep = 1.0 / 60.0;
+
+    var ball = {
+        radius: 0.2,
+        pos: { x: 0.2, y: 0.2 }, // положение
+        vel : {x : 10.0, y : 15.0} // скорость
+
+    }
+
+    // отрисовка
+
+    function draw() {
+        c.clearRect(0, 0, canvas.width, canvas.height);
+        c.fillStyle = "#FF00FF";
+
+        c.beginPath();
+        c.arc(
+            cX(ball.pos),
+            cY(ball.pos),
+            cScale * ball.radius, 0.0, 2.0 * Math.PI
+        );
+        c.closePath();
+        c.fill();
+    }
+
+    // симуляция -----
+
+    function simulate() {
+        
+        ball.vel.x += gravity.x * timeStep;
+        ball.vel.y += gravity.y * timeStep;
+        ball.pos.x += ball.vel.x * timeStep;
+        ball.pos.y += ball.vel.y * timeStep;
+
+        if (ball.pos.x < 0.0) {
+            ball.pos.x = 0.0;
+            ball.vel.x = -ball.vel.x;
+        }
+
+        if (ball.pos.x > simWidth) {
+            ball.pos.x = simWidth;
+            ball.vel.x = -ball.vel.x;
+        }
+
+        if (ball.pos.y < 0.0) {
+            ball.pos.y = 0.0;
+            ball.vel.y = -ball.vel.y;
+        }
+    }
+
+    // сделаем, чтобы браузер выполнял симуляцию
+    function update() {
+        simulate();
+        draw();
+        requestAnimationFrame(update);
+    }
+
+    update();
+
+    </script>
+    
+</body>
+</html>
